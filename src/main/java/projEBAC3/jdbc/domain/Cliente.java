@@ -1,16 +1,10 @@
-package projEBAC3.dao.domain;
+package projEBAC3.jdbc.domain;
 
 public class Cliente {
 
     private Long id;
     private String codigo;
     private String nome;
-
-    public Cliente(Long id, String codigo, String nome) {
-        this.id = id;
-        this.codigo = codigo;
-        this.nome = nome;
-    }
 
     public Long getId() {
         return id;
