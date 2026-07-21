@@ -5,3 +5,9 @@
 # ☕ Projeto EBAC 3 – CRUD com conexão PostgreSQL
 
 Em construção 🚧 🏗️
+
+☑️ Classe ClienteDAO;
+☑️ Conexão com o database;
+☑️ Integração com schema.sql;
+☑️ .sql com criação de tabela automática;
+☑️ Testes CRUD realizados;

@@ -3,12 +3,17 @@ package projEBAC3.jdbc.dao;
 import projEBAC3.factory.ConnectionFactory;
 import projEBAC3.jdbc.domain.Cliente;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClienteDAO implements IClienteDAO{
 
@@ -20,9 +25,14 @@ public class ClienteDAO implements IClienteDAO{
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
+
+            /// executa schema.sql em 'Resources'
+            executarSchema(connection);
+
             String sql = getInsert();
             statement = connection.prepareStatement(sql);
             addParametrosInsert(statement, cliente);
+
             return statement.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -168,7 +178,7 @@ public class ClienteDAO implements IClienteDAO{
 
     private String getSelect() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("SELECT * FROM TB_CLIENTE");
+        stringBuilder.append("SELECT * FROM TB_CLIENTE ");
         stringBuilder.append("WHERE CODIGO = ?");
 
         return stringBuilder.toString();
@@ -187,7 +197,7 @@ public class ClienteDAO implements IClienteDAO{
 
     private String getDelete() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("DELETE FROM TB_CLIENTE");
+        stringBuilder.append("DELETE FROM TB_CLIENTE ");
         stringBuilder.append("WHERE CODIGO = ?");
 
         return stringBuilder.toString();
@@ -195,6 +205,36 @@ public class ClienteDAO implements IClienteDAO{
 
     private void addParametrosDelete(PreparedStatement statement, Cliente cliente) throws SQLException {
         statement.setString(1, cliente.getCodigo());
+    }
+
+    /// Connection session
+
+    private void executarSchema(Connection connection) throws Exception {
+
+        InputStream input = ClienteDAO.class
+                            .getClassLoader()
+                            .getResourceAsStream("database/schema.sql");
+
+        if (input == null) {
+            throw new RuntimeException("ARQUIVO schema.sql NÃO ENCONTRADO.");
+        }
+
+        String sql;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+            sql = reader.lines().collect(Collectors.joining("\n"));
+        }
+
+        String[] comandos = sql.split(";");
+
+        for (String comando :  comandos) {
+            if (!comando.isBlank()) {
+                try (PreparedStatement statement = connection.prepareStatement(comando)) {
+                    statement.execute();
+                }
+            }
+        }
+
     }
 
     private void closeConnection(Connection connection, PreparedStatement statement, ResultSet result) {
@@ -212,9 +252,6 @@ public class ClienteDAO implements IClienteDAO{
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
-        } finally {
-            /// sempre fechar a conexão após execução.
-            closeConnection(connection, statement, null);
         }
     }
 }
