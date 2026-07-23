@@ -3,14 +3,14 @@ package projEBAC3test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import projEBAC3.jdbc.dao.ClienteDAO;
-import projEBAC3.jdbc.dao.IClienteDAO;
+import projEBAC3.jdbc.dao.InterfaceDAO;
 import projEBAC3.jdbc.domain.Cliente;
 
 import java.util.List;
 
 public class ClienteTest {
 
-    private IClienteDAO clienteDAO;
+    private InterfaceDAO clienteDAO;
 
     @Test
     public void cadastrarTest() throws Exception {

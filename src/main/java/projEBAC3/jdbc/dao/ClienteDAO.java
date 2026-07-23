@@ -3,19 +3,14 @@ package projEBAC3.jdbc.dao;
 import projEBAC3.factory.ConnectionFactory;
 import projEBAC3.jdbc.domain.Cliente;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ClienteDAO implements IClienteDAO{
+public class ClienteDAO extends AbstractDAO<Cliente> implements InterfaceDAO<Cliente> {
 
     /// CRUD session
     @Override
@@ -26,7 +21,7 @@ public class ClienteDAO implements IClienteDAO{
         try {
             connection = ConnectionFactory.getInstance().getConnection();
 
-            /// executa schema.sql em 'Resources'
+            /// executa schemaCliente.sql em 'Resources'
             executarSchema(connection);
 
             String sql = getInsert();
@@ -89,7 +84,7 @@ public class ClienteDAO implements IClienteDAO{
             throw e;
         } finally {
             /// sempre fechar a conexão após execução.
-            closeConnection(connection, statement, null);
+            closeConnection(connection, statement, result);
         }
         return cliente;
     }
@@ -123,7 +118,7 @@ public class ClienteDAO implements IClienteDAO{
             throw e;
         } finally {
             /// sempre fechar a conexão após execução.
-            closeConnection(connection, statement, null);
+            closeConnection(connection, statement, result);
         }
         return list;
     }
@@ -148,7 +143,8 @@ public class ClienteDAO implements IClienteDAO{
     }
 
     /// SQL session
-    private String getInsert() {
+    @Override
+    protected String getInsert() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("INSERT INTO TB_CLIENTE (ID, CODIGO, NOME) ");
         stringBuilder.append("VALUES (nextval('SQ_CLIENTE'),?,?)");
@@ -156,12 +152,9 @@ public class ClienteDAO implements IClienteDAO{
         return stringBuilder.toString();
     }
 
-    private void addParametrosInsert(PreparedStatement statement, Cliente cliente) throws SQLException {
-        statement.setString(1, cliente.getCodigo());
-        statement.setString(2, cliente.getNome());
-    }
 
-    private String getUpdate() {
+    @Override
+    protected String getUpdate() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("UPDATE TB_CLIENTE ");
         stringBuilder.append("SET NOME = ?, CODIGO = ? ");
@@ -170,88 +163,32 @@ public class ClienteDAO implements IClienteDAO{
         return stringBuilder.toString();
     }
 
-    private void addParametrosUpdate(PreparedStatement statement, Cliente cliente) throws SQLException {
+    @Override
+    protected void addParametrosInsert(PreparedStatement statement, Cliente cliente) throws SQLException {
+        statement.setString(1, cliente.getCodigo());
+        statement.setString(2, cliente.getNome());
+    }
+
+    @Override
+    protected void addParametrosUpdate(PreparedStatement statement, Cliente cliente) throws SQLException {
         statement.setString(1, cliente.getNome());
         statement.setString(2, cliente.getCodigo());
         statement.setLong(3, cliente.getId());
     }
 
-    private String getSelect() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("SELECT * FROM TB_CLIENTE ");
-        stringBuilder.append("WHERE CODIGO = ?");
-
-        return stringBuilder.toString();
-    }
-
-    private void addParametrosSelect(PreparedStatement statement, String codigo) throws SQLException {
-        statement.setString(1, codigo);
-    }
-
-    private String getSelectAll() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("SELECT * FROM TB_CLIENTE");
-
-        return stringBuilder.toString();
-    }
-
-    private String getDelete() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("DELETE FROM TB_CLIENTE ");
-        stringBuilder.append("WHERE CODIGO = ?");
-
-        return stringBuilder.toString();
-    }
-
-    private void addParametrosDelete(PreparedStatement statement, Cliente cliente) throws SQLException {
+    @Override
+    protected void addParametrosDelete(PreparedStatement statement, Cliente cliente) throws SQLException {
         statement.setString(1, cliente.getCodigo());
     }
 
-    /// Connection session
-
-    private void executarSchema(Connection connection) throws Exception {
-
-        InputStream input = ClienteDAO.class
-                            .getClassLoader()
-                            .getResourceAsStream("database/schema.sql");
-
-        if (input == null) {
-            throw new RuntimeException("ARQUIVO schema.sql NÃO ENCONTRADO.");
-        }
-
-        String sql;
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
-            sql = reader.lines().collect(Collectors.joining("\n"));
-        }
-
-        String[] comandos = sql.split(";");
-
-        for (String comando :  comandos) {
-            if (!comando.isBlank()) {
-                try (PreparedStatement statement = connection.prepareStatement(comando)) {
-                    statement.execute();
-                }
-            }
-        }
-
+    @Override
+    protected String getSchema() {
+        return "database/schemaCliente.sql";
     }
 
-    private void closeConnection(Connection connection, PreparedStatement statement, ResultSet result) {
-        try {
-            if (result != null && !result.isClosed()) {
-                result.close();
-            }
-
-            if (statement != null && !statement.isClosed()) {
-                statement.close();
-            }
-
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
+    @Override
+    protected String getTabela() {
+        return "TB_CLIENTE";
     }
+
 }

@@ -11,3 +11,6 @@ Em construção 🚧 🏗️
 ☑️ Integração com schema.sql;
 ☑️ .sql com criação de tabela automática;
 ☑️ Testes CRUD realizados;
+
+☑️ Refatoração para DAO para uma classe abstrata;
+☑️ Aplicação de métodos genéricos (T entity) para tornar o código DRY.
