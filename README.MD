@@ -6,11 +6,12 @@
 
 Em construção 🚧 🏗️
 
-☑️ Classe ClienteDAO;
-☑️ Conexão com o database;
-☑️ Integração com schema.sql;
-☑️ .sql com criação de tabela automática;
-☑️ Testes CRUD realizados;
-
-☑️ Refatoração para DAO para uma classe abstrata;
-☑️ Aplicação de métodos genéricos (T entity) para tornar o código DRY.
+☑️ Classe ClienteDAO;<br>
+☑️ Conexão com o database;<br>
+☑️ Integração com schema.sql;<br>
+☑️ .sql com criação de tabela automática;<br>
+☑️ Testes CRUD realizados;<br>
+<br>
+☑️ Refatoração para DAO para uma classe abstrata;<br>
+☑️ Aplicação de métodos genéricos (T entity) para tornar o código DRY.<br>
+☑️ CRUD Produto.<br>

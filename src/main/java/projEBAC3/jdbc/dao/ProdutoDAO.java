@@ -1,23 +1,19 @@
 package projEBAC3.jdbc.dao;
 
 import projEBAC3.factory.ConnectionFactory;
-import projEBAC3.jdbc.domain.Cliente;
 import projEBAC3.jdbc.domain.Produto;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ProdutoDAO implements InterfaceDAO<Produto> {
+public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Produto> {
 
-    /// CRUD session
+    /// CRUD SESSION
+    /// futuramente analisar abstração
     @Override
     public Integer cadastrar(Produto produto) throws Exception {
         Connection connection = null;
@@ -25,93 +21,186 @@ public class ProdutoDAO implements InterfaceDAO<Produto> {
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
-
-            /// executa schemaProduto.sql em 'Resources'
             executarSchema(connection);
 
             String sql = getInsert();
             statement = connection.prepareStatement(sql);
-            //addParametrosInsert(statement, produto);
+            addParametrosInsert(statement, produto);
 
             return statement.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            /// sempre fechar a conexão após execução.
+            closeConnection(connection, statement, null);
+        }
+
+    }
+
+    @Override
+    public Integer atualizar(Produto produto) throws Exception {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            executarSchema(connection);
+
+            String sql = getUpdate();
+            statement = connection.prepareStatement(sql);
+            addParametrosInsert(statement, produto);
+
+            return statement.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
             closeConnection(connection, statement, null);
         }
     }
 
     @Override
-    public Integer atualizar(Produto produto) throws Exception {
-        return 0;
-    }
-
-    @Override
     public Produto buscar(String codigo) throws Exception {
-        return null;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Produto produto = null;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            String sql = getSelect();
+            statement = connection.prepareStatement(sql);
+            addParametrosSelect(statement, codigo);
+            result = statement.executeQuery();
+
+            if (result.next()) {
+                produto = new Produto();
+                Long id = result.getLong("ID");
+                String nome = result.getString("NOME");
+                String cd = result.getString("CODIGO");
+                Double preco = result.getDouble("PREÇO");
+                Integer estoque = result.getInt("ESTOQUE");
+
+                produto.setId(id);
+                produto.setNome(nome);
+                produto.setCodigo(cd);
+                produto.setPreco(preco);
+                produto.setEstoque(estoque);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            /// sempre fechar a conexão após execução.
+            closeConnection(connection, statement, result);
+        }
+        return produto;
     }
 
     @Override
     public List<Produto> buscarTodos() throws Exception {
-        return List.of();
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        List<Produto> list = new ArrayList<>();
+        Produto produto;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            String sql = getSelectAll();
+            statement = connection.prepareStatement(sql);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                produto = new Produto();
+                Long id = result.getLong("ID");
+                String nome = result.getString("NOME");
+                String cd = result.getString("CODIGO");
+                Double preco = result.getDouble("PREÇO");
+                Integer estoque = result.getInt("ESTOQUE");
+
+                produto.setId(id);
+                produto.setNome(nome);
+                produto.setCodigo(cd);
+                produto.setPreco(preco);
+                produto.setEstoque(estoque);
+
+                list.add(produto);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            /// sempre fechar a conexão após execução.
+            closeConnection(connection, statement, result);
+        }
+        return list;
     }
 
     @Override
     public Integer excluir(Produto produto) throws Exception {
-        return 0;
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            String sql = getDelete();
+            statement = connection.prepareStatement(sql);
+            addParametrosDelete(statement, produto);
+            return statement.executeUpdate();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            closeConnection(connection, statement, null);
+        }
     }
 
     /// SQL session
-    private String getInsert() {
+    @Override
+    protected String getInsert() {
         StringBuilder stringBuilder = new StringBuilder();
-        //stringBuilder.append();
-        return null;
+        stringBuilder.append("INSERT INTO TB_PRODUTO (ID, CODIGO, NOME, PREÇO, ESTOQUE) ");
+        stringBuilder.append("VALUES (nextval('SQ_PRODUTO'),?,?,?,?)");
+
+        return stringBuilder.toString();
     }
 
-    /// connection session
-    private void executarSchema(Connection connection) throws Exception {
+    @Override
+    protected String getUpdate() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("UPDATE TB_PRODUTO ");
+        stringBuilder.append("SET NOME = ?, CODIGO = ?, ");
+        stringBuilder.append("SET PREÇO = ?, ESTOQUE = ? ");
+        stringBuilder.append("WHERE ID = ?");
 
-        InputStream input = ClienteDAO.class
-                            .getClassLoader()
-                            .getResourceAsStream("database/schemaProduto.sql");
-
-        if (input == null) {
-            throw new RuntimeException("ARQUIVO schemaProduto.sql NÃO ENCONTRADO.");
-        }
-
-        String sql;
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
-            sql = reader.lines().collect(Collectors.joining("\n"));
-        }
-
-        String[] comandos = sql.split(";");
-
-        for (String comando : comandos) {
-            if (!comando.isBlank()) {
-                try (PreparedStatement statement = connection.prepareStatement(comando)) {
-                    statement.execute();
-                }
-            }
-        }
+        return stringBuilder.toString();
     }
 
-    private void closeConnection(Connection connection, PreparedStatement statement, ResultSet result) {
-        try {
-            if (result != null && !result.isClosed()) {
-                result.close();
-            }
+    @Override
+    protected void addParametrosInsert(PreparedStatement statement, Produto produto) throws SQLException {
+        statement.setString(1, produto.getNome());
+        statement.setString(2, produto.getCodigo());
+        statement.setDouble(3, produto.getPreco());
+        statement.setInt(4, produto.getEstoque());
+    }
 
-            if (statement != null && !statement.isClosed()) {
-                statement.close();
-            }
+    @Override
+    protected void addParametrosUpdate(PreparedStatement statement, Produto produto) throws SQLException {
+        statement.setString(1, produto.getNome());
+        statement.setString(2, produto.getCodigo());
+        statement.setDouble(3, produto.getPreco());
+        statement.setInt(4, produto.getEstoque());
+        statement.setLong(5, produto.getId());
+    }
 
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
+    @Override
+    protected void addParametrosDelete(PreparedStatement statement, Produto produto) throws SQLException {
+        statement.setLong(1, produto.getId());
+    }
+
+    @Override
+    protected String getSchema() {
+        return "database/schemaProduto.sql";
+    }
+
+    @Override
+    protected String getTabela() {
+        return "TB_PRODUTO";
     }
 }

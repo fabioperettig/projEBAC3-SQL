@@ -26,6 +26,9 @@ public class ClienteDAO extends AbstractDAO<Cliente> implements InterfaceDAO<Cli
 
             String sql = getInsert();
             statement = connection.prepareStatement(sql);
+
+            /// futuramente deixar DAO abstract com getEntidade()
+            ///returnando cliente ou produto;
             addParametrosInsert(statement, cliente);
 
             return statement.executeUpdate();
@@ -45,8 +48,10 @@ public class ClienteDAO extends AbstractDAO<Cliente> implements InterfaceDAO<Cli
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             String sql = getUpdate();
+
             statement = connection.prepareStatement(sql);
             addParametrosUpdate(statement, cliente);
+
             return statement.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -95,7 +100,7 @@ public class ClienteDAO extends AbstractDAO<Cliente> implements InterfaceDAO<Cli
         PreparedStatement statement = null;
         ResultSet result = null;
         List<Cliente> list = new ArrayList<>();
-        Cliente cliente = null;
+        Cliente cliente;
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
@@ -112,6 +117,7 @@ public class ClienteDAO extends AbstractDAO<Cliente> implements InterfaceDAO<Cli
                 cliente.setId(id);
                 cliente.setNome(nome);
                 cliente.setCodigo(cd);
+
                 list.add(cliente);
             }
         } catch (Exception e) {
