@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ClienteTest {
 
-    private InterfaceDAO clienteDAO;
+    private InterfaceDAO<Cliente> clienteDAO;
 
     @Test
     public void cadastrarTest() throws Exception {
@@ -34,6 +34,7 @@ public class ClienteTest {
         Assertions.assertEquals(1, qtdExcluida);
     }
 
+    /// futuramente mudar para try/catch cadastrarTest() para um código dry;
     @Test
     public void buscarTest() throws Exception {
         clienteDAO = new ClienteDAO();
@@ -56,6 +57,7 @@ public class ClienteTest {
         Assertions.assertEquals(1, qtdExcluida);
     }
 
+    /// futuramente mudar para try/catch cadastrarTest() para um código dry;
     @Test
     public void excluirTest() throws Exception {
         clienteDAO = new ClienteDAO();

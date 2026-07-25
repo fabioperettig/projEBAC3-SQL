@@ -170,17 +170,18 @@ public class ClienteDAO extends AbstractDAO<Cliente> implements InterfaceDAO<Cli
     }
 
     @Override
-    protected void addParametrosInsert(PreparedStatement statement, Cliente cliente) throws SQLException {
-        statement.setString(1, cliente.getCodigo());
-        statement.setString(2, cliente.getNome());
-    }
-
-    @Override
     protected void addParametrosUpdate(PreparedStatement statement, Cliente cliente) throws SQLException {
         statement.setString(1, cliente.getNome());
         statement.setString(2, cliente.getCodigo());
         statement.setLong(3, cliente.getId());
     }
+
+    @Override
+    protected void addParametrosInsert(PreparedStatement statement, Cliente cliente) throws SQLException {
+        statement.setString(1, cliente.getCodigo());
+        statement.setString(2, cliente.getNome());
+    }
+
 
     @Override
     protected void addParametrosDelete(PreparedStatement statement, Cliente cliente) throws SQLException {

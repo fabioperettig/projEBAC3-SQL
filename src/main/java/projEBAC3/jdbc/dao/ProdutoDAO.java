@@ -43,11 +43,10 @@ public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Pro
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
-            executarSchema(connection);
-
             String sql = getUpdate();
+
             statement = connection.prepareStatement(sql);
-            addParametrosInsert(statement, produto);
+            addParametrosUpdate(statement, produto);
 
             return statement.executeUpdate();
         } catch (Exception e) {
@@ -76,7 +75,7 @@ public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Pro
                 Long id = result.getLong("ID");
                 String nome = result.getString("NOME");
                 String cd = result.getString("CODIGO");
-                Double preco = result.getDouble("PREÇO");
+                Double preco = result.getDouble("PRECO");
                 Integer estoque = result.getInt("ESTOQUE");
 
                 produto.setId(id);
@@ -113,7 +112,7 @@ public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Pro
                 Long id = result.getLong("ID");
                 String nome = result.getString("NOME");
                 String cd = result.getString("CODIGO");
-                Double preco = result.getDouble("PREÇO");
+                Double preco = result.getDouble("PRECO");
                 Integer estoque = result.getInt("ESTOQUE");
 
                 produto.setId(id);
@@ -155,7 +154,7 @@ public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Pro
     @Override
     protected String getInsert() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("INSERT INTO TB_PRODUTO (ID, CODIGO, NOME, PREÇO, ESTOQUE) ");
+        stringBuilder.append("INSERT INTO TB_PRODUTO (ID, NOME, CODIGO, PRECO, ESTOQUE) ");
         stringBuilder.append("VALUES (nextval('SQ_PRODUTO'),?,?,?,?)");
 
         return stringBuilder.toString();
@@ -166,18 +165,10 @@ public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Pro
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("UPDATE TB_PRODUTO ");
         stringBuilder.append("SET NOME = ?, CODIGO = ?, ");
-        stringBuilder.append("SET PREÇO = ?, ESTOQUE = ? ");
+        stringBuilder.append("PRECO = ?, ESTOQUE = ? ");
         stringBuilder.append("WHERE ID = ?");
 
         return stringBuilder.toString();
-    }
-
-    @Override
-    protected void addParametrosInsert(PreparedStatement statement, Produto produto) throws SQLException {
-        statement.setString(1, produto.getNome());
-        statement.setString(2, produto.getCodigo());
-        statement.setDouble(3, produto.getPreco());
-        statement.setInt(4, produto.getEstoque());
     }
 
     @Override
@@ -190,8 +181,18 @@ public class ProdutoDAO extends AbstractDAO<Produto> implements InterfaceDAO<Pro
     }
 
     @Override
+    protected void addParametrosInsert(PreparedStatement statement, Produto produto) throws SQLException {
+        statement.setString(1, produto.getNome());
+        statement.setString(2, produto.getCodigo());
+        statement.setDouble(3, produto.getPreco());
+        statement.setInt(4, produto.getEstoque());
+    }
+
+
+
+    @Override
     protected void addParametrosDelete(PreparedStatement statement, Produto produto) throws SQLException {
-        statement.setLong(1, produto.getId());
+        statement.setString(1, produto.getCodigo());
     }
 
     @Override

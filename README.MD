@@ -4,14 +4,15 @@
 
 # ☕ Projeto EBAC 3 – CRUD com conexão PostgreSQL
 
-Em construção 🚧 🏗️
+**Este projeto implementa um CRUD completo utilizando JDBC e PostgreSQL, sem o auxílio de frameworks como Spring Data ou Hibernate.**
 
-☑️ Classe ClienteDAO;<br>
-☑️ Conexão com o database;<br>
-☑️ Integração com schema.sql;<br>
-☑️ .sql com criação de tabela automática;<br>
-☑️ Testes CRUD realizados;<br>
-<br>
-☑️ Refatoração para DAO para uma classe abstrata;<br>
-☑️ Aplicação de métodos genéricos (T entity) para tornar o código DRY.<br>
-☑️ CRUD Produto.<br>
+Embora o curso apresenta uma implementação funcional, optei por aplicar refatorações próprias, reduzindo duplicação de código e tornando a arquitetura mais reutilizável através de Generics e uma classe abstrata para o DAO.
+
+<details><Summary>Objetivos do projeto</Summary>
+
+* Implementar completa de CRUD via JDBC
+* Praticar SQL e PostgreSQL integrado ao Java
+* Abstração de Classe DAO
+* Aplicar Generics para um melhor drycode
+* Criar testes automatizados via JUnit
+</details>
