@@ -2,7 +2,7 @@
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Projeto Curso EBAC](https://img.shields.io/badge/Projeto--Curso--EBAC-navy?style=for-the-badge)
 
-# ☕ Projeto EBAC 3 – CRUD com conexão PostgreSQL
+# ☕ Projeto EBAC – Persistência de Dados com Java JDBC, Generics & PostgreSQL
 
 **Este projeto implementa um CRUD completo utilizando JDBC e PostgreSQL, sem o auxílio de frameworks como Spring Data ou Hibernate.**
 
